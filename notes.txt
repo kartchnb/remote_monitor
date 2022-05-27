@@ -1,5 +1,7 @@
 To enable the virtual displays, the file 20-intel.conf needs to be copied to /usr/share/X11/xorg.conf.d/
 
+Right now, only one remote monitor can be enabled at a time.  This appears to be limitation of the VNC server I'm using..
+
 I've tried the following Android VNC viewers:
 
     - bVNC: Secure VNC Viewer
