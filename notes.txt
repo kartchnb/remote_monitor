@@ -1,0 +1,55 @@
+To enable the virtual displays, the file 20-intel.conf needs to be copied to /usr/share/X11/xorg.conf.d/
+
+I've tried the following Android VNC viewers:
+
+    - bVNC: Secure VNC Viewer
+        Seems to work well, but has an annoying splash screen that comes up every time
+        Might be worth buying the Prop version
+        This is the best app I tried and is pretty much perfect for what I need
+
+    - TSVNC
+        Forces landscape
+        Really nice otherwise.  Automatically launches into fullscreen.
+        Shows a small dot in the center (local mouse?) but that's not a huge issue - can be manually moved out of the way
+        No settings that I could find
+
+
+
+    - Vnc Viewer - Remote Desktop
+        Does not display the remote computer's mouse, which renders it useless
+
+    - VNC Viewer for Android
+        Forces the display to landscape
+        Must set scaling to "Fit to Screen"
+        I can't figure out how to get the menu to come up sometimes
+        Doesn't seem to want to go full screen
+        Seems slower than the other options
+
+    - MultiVNC
+        A little annoying that the screen can't automatically be scaled to Fit
+        Maybe a little slow?
+        The menu can't be turned off
+
+    - Desktop VNC Viewer
+        Ads. Yuck.
+        Display artifacts
+        Menu items can't be turned off
+
+    - droidVNC-NG
+        VNC server, not a viewers
+
+    - TruVnc Secured Vnc Client
+        Trial basis
+        Displays the mouse the best
+        Fullscreen isn't really fullscreen
+
+    - Mocha VNC Lite
+        Lots of settings
+        Also won't go full screen (Android bars appear on top and bottom)
+
+    - RemoteToGo RDP/VNC For Android
+        Didn't try because it wanted access to my photos...
+
+    -aRDP: Secure RDP Client
+        RDP only
+        
