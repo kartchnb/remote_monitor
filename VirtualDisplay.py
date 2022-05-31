@@ -1,4 +1,5 @@
 import re
+import signal
 
 from RunCommand import RunCommand
 
@@ -8,16 +9,23 @@ from RunCommand import RunCommand
 
 
 class VirtualDisplay:
+
+    # The maximum virtual display number to support
+    _maxDisplayNum = 9
+
+    # Standard frequency for all remote monitors
+    _frequency = 60
     
-    def __init__(self, display_num, hres, vres, freq):
+    def __init__(self, display_num, hres, vres):
         # Determine the output name
         output_name = f'VIRTUAL{display_num}'
         self.output_name = output_name
 
         # Determine the parameters for the new display
-        mode_name = f'{hres}x{vres}_{freq}'
-        mode_params = self._GenerateXrandrParams(hres, vres, freq)
-        
+        mode_name = f'{hres}x{vres}_{self._frequency}'
+        self.mode_name = mode_name
+        mode_params = self._GenerateXrandrParams(hres, vres, self._frequency)
+
         # TODO: Need to check if the display mode already exists first!
         # TODO: If we try to recreate an existing display mode, xrandr errors
 
@@ -30,6 +38,31 @@ class VirtualDisplay:
         # Enable the requested output using the new display mode
         RunCommand(f'xrandr --output {output_name} --mode {mode_name}')
 
+        # Add a handler for CTRL-C
+        signal.signal(signal.SIGINT, self._CtrlCHandler)
+
+
+
+    def __del__(self):
+        self.Close()
+
+
+
+    # Close the virtual display
+    def Close(self):
+        output_name = self.output_name
+        mode_name = self.mode_name
+
+        # Delete the virtual display
+        RunCommand(f'xrandr --output {output_name} --off')
+        RunCommand(f'xrandr --delmode {output_name} {mode_name}')
+
+
+
+    # Called when CTRL-C is received
+    def _CtrlCHandler(self, signum, frame):
+        self.Close()
+
 
 
     # Determine the correct parameters for the new display
@@ -37,7 +70,6 @@ class VirtualDisplay:
         # Get the raw parameter line
         try:
             mode_output = RunCommand(f'cvt {hres} {vres} {freq}').split('\n')[1]
-            print(mode_output)
         except IndexError:
             raise VirtualDisplayError('Unable to determine display parameters')
 
@@ -55,34 +87,3 @@ class VirtualDisplay:
 class VirtualDisplayError(Exception):
     def __init__(self, message):
         self.message = message
-
-
-
-if __name__ == '__main__':
-    import sys
-
-    try:
-        display_num = sys.argv[1]
-    except IndexError:
-        display_num = 1
-
-    try:
-        hres = sys.argv[2]
-    except IndexError:
-        hres = 960
-
-    try:
-        vres = sys.argv[3]
-    except IndexError:
-        vres = 600
-
-    try:
-        freq = sys.argv[4]
-    except IndexError:
-        freq = 60
-
-    try:
-        print(f'Configuring virtual display {display_num} for {hres}x{vres} at {freq} Hz')
-        virtualDisplay = VirtualDisplay(display_num, hres, vres, freq)
-    except VirtualDisplayError as e:
-        print(f'VirtualDisplay Error: {e.message}')

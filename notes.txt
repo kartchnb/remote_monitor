@@ -1,6 +1,46 @@
-To enable the virtual displays, the file 20-intel.conf needs to be copied to /usr/share/X11/xorg.conf.d/
+This project is an attempt to allow multiple monitors to be connected to a computer remotely using virtual outputs and VNC.  The result is what I'm calling a "remote monitor"  
+So far, I've had success with up to 3 remote monitors using a combination of an Android cell phone, Android tablet, and a Raspberry Pi running Rasbian.
 
-Right now, only one remote monitor can be enabled at a time.  This appears to be limitation of the VNC server I'm using..
+To Configure your Linux computer as a remote monitor host:
+1) Copy 20-intel.conf to /usr/share/X11/xorg.conf.d/
+    > sudo cp 20-intel.conf /usr/share/X11/xorg.conf.d/
+2) Reboot.
+3) Determine the ip address of the host computer.
+    > ifconfig
+4) Assign a "display number" (1-4) to the remote monitor.  This should be unique to each remote monitor.
+5) Determine the port the remote monitor should use (default is 5900 - it's recommended to go up from there).  Each remote monitor must use a different port.
+6) Determine the resolution of the remote monitor (this can easily be found by navigating to http://whatismyscreenresolution.net/).
+7) Pass these parameters to launch.py for each remote monitor.
+    > /usr/bin/python3 launch.py <DISPLAY NUMBER> <HORIZONTAL RESOLUTION> <VERTICAL RESOLUTION> <PORT>
+8) Follow the prompts to arrange the displays and launch VNC.
+
+
+To use an Android device as a remote monitor
+1) Us bVNC: Secure VNC Viewer
+
+
+To use a Raspberry Pi as a dedicated remote monitor:
+1) Install a fresh OS install.
+2) Configure to automatically boot into the Console.
+3) Probably a good idea to enable SSH as well.
+4) Install Tight VNC Viewer.
+    > sudo apt-get install xtightvncviewer
+5) Copy the remote-monitor.config file to the Raspberry Pi and customize it as needed.
+6) Copy the start-remote-monitor.sh file to the Raspberry Pi.
+7) Modify the .bashrc file to launch the VNC viewer after login.
+    # Continuously attempt to connect the remote monitor (unless in an SSH session)
+    while [[ -z ${SSH_TTY} ]]
+    do
+        ./start-remote-monitor.sh
+    done
+
+
+
+TODO: 
+    The launch.py should handle command-line parameters better.
+    Keep track of the virtual displays in use so that a "display number" and "port" can be automatically assigned rather than specified.
+
+    
 
 I've tried the following Android VNC viewers:
 
@@ -8,6 +48,7 @@ I've tried the following Android VNC viewers:
         Seems to work well, but has an annoying splash screen that comes up every time
         Might be worth buying the Prop version
         This is the best app I tried and is pretty much perfect for what I need
+        Set scaling to "Fit to Screen" works the best
 
     - TSVNC
         Forces landscape
@@ -16,6 +57,7 @@ I've tried the following Android VNC viewers:
         No settings that I could find
 
 
+    -------- NO BUENO BELOW THIS POINT --------
 
     - Vnc Viewer - Remote Desktop
         Does not display the remote computer's mouse, which renders it useless
@@ -55,3 +97,18 @@ I've tried the following Android VNC viewers:
     -aRDP: Secure RDP Client
         RDP only
         
+I've tried the following Linux VNC clients:
+    - TigerVNC
+        > sudo apt install xvnc4viewer
+        Doesn't display the cursor, which renders it useless
+        
+    - Vinagre (Icon shows as Remote Desktop Viewer)
+        > sudo apt install vinagre
+        Doesn't display the cursor
+        
+    - Xtightvncviewer
+        > sudo apt install xtightvncviewer
+        Ran with the following command lines and options. 
+        Worked well, fullscreen, mouse, but couldn't exit
+            > xtightvncviewer -viewonly -fullscreen -noraiseonbeep -x11cursor 192.168.0.39:0
+            > xtightvncviewer -viewonly -fullscreen -noraiseonbeep -nocursorshape 192.168.0.39:0

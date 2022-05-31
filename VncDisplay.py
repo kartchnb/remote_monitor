@@ -6,9 +6,9 @@ from RunCommand import RunCommand
 
 class VncDisplay():
 
-    def __init__(self, output_name, ncache=0):
+    def __init__(self, output_name, port=5900):
         clip_area = self._DetermineClipArea(output_name)
-        self._LaunchVnc(clip_area, ncache)
+        self._LaunchVnc(clip_area, port)
 
 
 
@@ -34,11 +34,11 @@ class VncDisplay():
 
 
 
-    def _LaunchVnc(self, clip_area, ncache):
-        command = f'x11vnc -clip {clip_area} -repeat -forever'
-        if ncache > 0:
-            command += f' -ncache {ncache}'
+    def _LaunchVnc(self, clip_area, port):
+        #command = f'x11vnc -clip {clip_area} -rfbport {port} -repeat -forever'
+        command = f'x11vnc -clip {clip_area} -rfbport {port}'
 
+        print(f'Launch VNC with command: {command}')
         RunCommand(command)
 
 
@@ -46,19 +46,3 @@ class VncDisplay():
 class VncDisplayError(Exception):
     def __init__(self, message):
         self.message = message
-
-
-
-if __name__ == '__main__':
-    import sys
-    
-    try:
-        output_name = sys.argv[1]
-    except IndexError:
-        output_name = 'VIRTUAL1'
-
-    try:
-        print(f'Exporting output "{output_name}" over VNC')
-        vncDisplay = VncDisplay(output_name)
-    except VncDisplayError as e:
-        print(f'VncDisplay Error: {e.message}')
