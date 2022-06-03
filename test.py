@@ -1,6 +1,11 @@
+#!/usr/bin/python3
+
 from VirtualDisplay import VirtualDisplay, VirtualDisplayError
 
-virtualDisplay = VirtualDisplay(0, 1920, 1080)
-outputName = virtualDisplay.output_name
+try:
+    virtualDisplay = VirtualDisplay(1920, 1080)
+    outputName = virtualDisplay.output_name
+    print(f'outputName={outputName}')
 
-print(f'outputName={outputName}')
+except VirtualDisplayError as e:
+    print(f'ERROR: {e.message}')

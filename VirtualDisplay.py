@@ -10,33 +10,44 @@ from RunCommand import RunCommand
 
 class VirtualDisplay:
 
-    # The maximum virtual display number to support
-    _maxDisplayNum = 9
+    # The minimum and maximum virtual display numbers to support
+    _minVirtualDisplayNum = 1
+    _maxVirtualDisplayNum = 9
 
     # Standard frequency for all remote monitors
     _frequency = 60
     
-    def __init__(self, display_num, hres, vres):
-        # Determine the output name
-        output_name = f'VIRTUAL{display_num}'
-        self.output_name = output_name
+    def __init__(self, hres, vres):
+        self.output_name = ''
+        
+        # Determine the mode name 
+        self.mode_name = f'{hres}x{vres}_{self._frequency}'
+
+        # Iterate over each possible virtual display name
+        for display_num in range(self._minVirtualDisplayNum, self._maxVirtualDisplayNum + 1):
+            # If this display name is available, use it
+            result = RunCommand('xrandr')
+            search_string = f'VIRTUAL{display_num} disconnected'
+            print(f'Searching for "{search_string}"')
+            match = re.search(search_string, result)
+            if (match):
+                self.output_name = f'VIRTUAL{display_num}'
+                break
+
+        if self.output_name == '':
+            raise VirtualDisplayError('No available virtual displays were found')
 
         # Determine the parameters for the new display
-        mode_name = f'{hres}x{vres}_{self._frequency}'
-        self.mode_name = mode_name
         mode_params = self._GenerateXrandrParams(hres, vres, self._frequency)
 
-        # TODO: Need to check if the display mode already exists first!
-        # TODO: If we try to recreate an existing display mode, xrandr errors
-
         # Create the new display mode
-        RunCommand(f'xrandr --newmode {mode_name} {mode_params}')
+        RunCommand(f'xrandr --newmode {self.mode_name} {mode_params}')
 
         # Add the display mode for the requested output
-        RunCommand(f'xrandr --addmode {output_name} {mode_name}')
+        RunCommand(f'xrandr --addmode {self.output_name} {self.mode_name}')
 
         # Enable the requested output using the new display mode
-        RunCommand(f'xrandr --output {output_name} --mode {mode_name}')
+        RunCommand(f'xrandr --output {self.output_name} --mode {self.mode_name}')
 
         # Add a handler for CTRL-C
         signal.signal(signal.SIGINT, self._CtrlCHandler)
@@ -50,12 +61,10 @@ class VirtualDisplay:
 
     # Close the virtual display
     def Close(self):
-        output_name = self.output_name
-        mode_name = self.mode_name
-
         # Delete the virtual display
-        RunCommand(f'xrandr --output {output_name} --off')
-        RunCommand(f'xrandr --delmode {output_name} {mode_name}')
+        if self.output_name != '':
+            RunCommand(f'xrandr --output {self.output_name} --off')
+            RunCommand(f'xrandr --delmode {self.output_name} {self.mode_name}')
 
 
 

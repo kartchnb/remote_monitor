@@ -10,13 +10,13 @@ from VncDisplay import VncDisplay, VncDisplayError
 
 class RemoteMonitor():
 
-    def __init__(self, displayNum, hres, vres, port):
+    def __init__(self, hres, vres, port):
         # Initialize the notify interface
         notify2.init('Remote Monitor Test')
 
         # Create a virtual display for the remote monitor
         try:
-            virtualDisplay = VirtualDisplay(displayNum, hres, vres)
+            virtualDisplay = VirtualDisplay(hres, vres)
             outputName = virtualDisplay.output_name
         except VirtualDisplayError as e:
             raise RemoteMonitorError(e.message)
