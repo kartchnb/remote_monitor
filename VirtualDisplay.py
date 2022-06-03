@@ -4,8 +4,7 @@ import signal
 from RunCommand import RunCommand
 
 
-# TODO: Move run_command functionality out of this class
-# TODO: See if we an remove all system calls and do this organically
+# TODO: See if we an remove all xrandr system calls and do this organically
 
 
 class VirtualDisplay:
@@ -15,13 +14,13 @@ class VirtualDisplay:
     _maxVirtualDisplayNum = 9
 
     # Standard frequency for all remote monitors
-    _frequency = 60
+    _frequency = 5
     
     def __init__(self, hres, vres):
         self.output_name = ''
         
         # Determine the mode name 
-        self.mode_name = f'{hres}x{vres}_{self._frequency}'
+        self.mode_name = f'RM_{hres}x{vres}'
 
         # Iterate over each possible virtual display name
         for display_num in range(self._minVirtualDisplayNum, self._maxVirtualDisplayNum + 1):
