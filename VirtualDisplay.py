@@ -48,8 +48,9 @@ class VirtualDisplay:
         # Enable the requested output using the new display mode
         RunCommand(f'xrandr --output {self.output_name} --mode {self.mode_name}')
 
-        # Add a handler for CTRL-C
-        signal.signal(signal.SIGINT, self._CtrlCHandler)
+        # Add a handler for CTRL-C and terminal closing
+        signal.signal(signal.SIGINT, self._SignalHandler)
+        signal.signal(signal.SIGHUP, self._SignalHandler)
 
 
 
@@ -67,8 +68,8 @@ class VirtualDisplay:
 
 
 
-    # Called when CTRL-C is received
-    def _CtrlCHandler(self, signum, frame):
+    # Called when CTRL-C is received or the terminal window is closed
+    def _SignalHandler(self, signum, frame):
         self.Close()
 
 
